@@ -1,8 +1,9 @@
 # How to mock Hubspot API?
 
-mock-basic-api.test.ts :white_check_mark:  
-mock-get-all.test.ts :white_check_mark:  
-multiple-mocks.test.ts :error:  
+:white_check_mark: mock-basic-api.test.ts   
+:white_check_mark: mock-get-all.test.ts  
+:x: multiple-mocks.test.ts  
+:x: es-modules-multiple-mock.test.ts  
 
 ## Tech stack
 * NodeJS

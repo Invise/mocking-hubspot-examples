@@ -1,31 +1,33 @@
 import { Client } from "@hubspot/api-client";
+import { PromiseBasicApi } from "@hubspot/api-client/lib/codegen/crm/products/types/PromiseAPI";
 import { ProductsDiscovery } from "@hubspot/api-client/lib/src/discovery/crm/products/ProductsDiscovery";
+
 const mockCreate = jest.fn()
 const mockUpdate = jest.fn()
 
-jest.mock("@hubspot/api-client/lib/codegen/crm/products/types/PromiseAPI", () => {
+jest.mock('@hubspot/api-client/lib/codegen/crm/products/types/PromiseAPI', () => {
+    const actual = jest.requireActual('@hubspot/api-client/lib/codegen/crm/products/types/PromiseAPI');
+  
     return {
-        ...jest.requireActual("@hubspot/api-client/lib/codegen/crm/products/types/PromiseAPI"),
+        __esModule: true,
+        ...actual,
         PromiseBasicApi: jest.fn().mockImplementation(() => {
             return {
                 create: mockCreate,
                 update: mockUpdate,
             }
         })
-    }
-})
+    };
+});
 
-ProductsDiscovery
-
-jest.mock("@hubspot/api-client/lib/src/discovery/crm/products/ProductsDiscovery", () => {
-    const actual = jest.requireActual("@hubspot/api-client/lib/src/discovery/crm/products/ProductsDiscovery")
-    console.log(actual.ProductsDiscovery)
+jest.mock('@hubspot/api-client/lib/src/discovery/crm/products/ProductsDiscovery', () => {
+    const actual = jest.requireActual('@hubspot/api-client/lib/src/discovery/crm/products/ProductsDiscovery');
+  
     return {
+        __esModule: true,
+        ...actual,
         ProductsDiscovery: jest.fn().mockImplementation(() => {
-            return {
-                basicApi: jest.fn().mockImplementation(() => {
-                    console.log("MOCK MICHEAL")
-                }),
+            return {                
                 getAll: jest.fn().mockImplementation(() => {
                     return [
                         {
@@ -38,10 +40,10 @@ jest.mock("@hubspot/api-client/lib/src/discovery/crm/products/ProductsDiscovery"
                 })
             }
         })
-    }
+    };
 });
 
-it('can mock basicApi', async () => {
+it('can mock multiple things at once', async () => {
     const client = new Client({accessToken: 'dummy'});
     const product = {properties: {name: 'non-existing-product-name'}};
 
@@ -49,11 +51,4 @@ it('can mock basicApi', async () => {
 
     expect(mockUpdate).not.toHaveBeenCalled();
     expect(mockCreate).toHaveBeenCalledWith(product);
-})
-
-it('can mock getAll', async () => {
-    const client = new Client({accessToken: 'dummy'});
-    const results = await client.crm.products.getAll()
-
-    expect(results).toStrictEqual([ { id: 1, properties: { name: 'existing-product-name' } } ]);
 })
